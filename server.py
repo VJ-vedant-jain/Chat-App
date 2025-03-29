@@ -1,13 +1,9 @@
 import socket
 import threading
+from config import *
 
 class ChatServer:
-    HEADER = 1024
-    FORMAT = 'utf-8'
-    DISCONNECT_MESSAGE = '!DISCONNECT'
-    USER_LIST_UPDATE = '!USER_LIST'
-
-    def __init__(self, host=socket.gethostbyname(socket.gethostname()), port=9090):
+    def __init__(self, host=socket.gethostbyname(socket.gethostname()), port=PORT):
         self.port = port
         self.host = host
         self.addr = (self.host, self.port)
@@ -34,7 +30,7 @@ class ChatServer:
 
     def update_user_list(self):
         user_list = list(self.clients.values())
-        self.broadcast(f"{self.USER_LIST_UPDATE}:{','.join(user_list)}")
+        self.broadcast(f"{USER_LIST_UPDATE}:{','.join(user_list)}")
 
     def broadcast(self, message):
         print(f"Broadcasting: {message}")
@@ -42,7 +38,7 @@ class ChatServer:
 
         for client in list(self.clients.keys()):
             try:
-                client.send(message.encode(self.FORMAT))
+                client.send(message.encode(FORMAT))
             except Exception:
                 print(f"Failed to send message to {self.clients.get(client, 'unknown')}")
                 disconnected_clients.append(client)
@@ -66,11 +62,11 @@ class ChatServer:
 
         try:
             while True:
-                message = conn.recv(self.HEADER).decode(self.FORMAT)
+                message = conn.recv(HEADER).decode(FORMAT)
                 if not message:
                     break
 
-                if message == self.DISCONNECT_MESSAGE:
+                if message == DISCONNECT_MESSAGE:
                     print(f"User {username} disconnected")
                     break
 
@@ -88,14 +84,14 @@ class ChatServer:
     def register_username(self, conn):
         while True:
             try:
-                username = conn.recv(self.HEADER).decode(self.FORMAT)
+                username = conn.recv(HEADER).decode(FORMAT)
                 if not username:
                     return None
 
                 if username in self.clients.values():
-                    conn.send("Taken".encode(self.FORMAT))
+                    conn.send(USERNAME_TAKEN.encode(FORMAT))
                 else:
-                    conn.send("Ok".encode(self.FORMAT))
+                    conn.send(USERNAME_ACCEPTED.encode(FORMAT))
                     return username
             except Exception as e:
                 print(f"Error during username registration: {e}")
@@ -104,36 +100,36 @@ class ChatServer:
     def process_message(self, conn, sender, message):
         words = message.strip().split()
 
-        if len(words) >= 3 and words[0] == '/w':
+        if len(words) >= 3 and words[0] == WHISPER_CMD:
             self.handle_whisper(conn, sender, words[1], ' '.join(words[2:]))
-        elif len(words) >= 3 and words[0] == '/dm':
+        elif len(words) >= 3 and words[0] == DM_CMD:
             self.handle_direct_message(conn, sender, words[1], ' '.join(words[2:]))
         else:
             self.broadcast(f"[{sender}]: {message}")
 
     def handle_whisper(self, sender_conn, sender_name, recipient_name, message):
         if recipient_name not in self.clients.values():
-            sender_conn.send(f"User {recipient_name} not found.".encode(self.FORMAT))
+            sender_conn.send(f"User {recipient_name} not found.".encode(FORMAT))
             return
 
         print(f"Whisper from {sender_name} to {recipient_name}: {message}")
 
         for client, name in self.clients.items():
             if name == recipient_name:
-                client.send(f"[Whisper from {sender_name}]: {message}".encode(self.FORMAT))
-                sender_conn.send(f"[Whisper to {recipient_name}]: {message}".encode(self.FORMAT))
+                client.send(f"[Whisper from {sender_name}]: {message}".encode(FORMAT))
+                sender_conn.send(f"[Whisper to {recipient_name}]: {message}".encode(FORMAT))
                 break
 
     def handle_direct_message(self, sender_conn, sender_name, recipient_name, message):
         if recipient_name not in self.clients.values():
-            sender_conn.send(f"User {recipient_name} not found.".encode(self.FORMAT))
+            sender_conn.send(f"User {recipient_name} not found.".encode(FORMAT))
             return
 
         print(f"DM from {sender_name} to {recipient_name}: {message}")
 
         for client, name in self.clients.items():
             if name == recipient_name:
-                client.send(f"DM [{sender_name}]: {message}".encode(self.FORMAT))
+                client.send(f"DM [{sender_name}]: {message}".encode(FORMAT))
                 break
 
 if __name__ == "__main__":
