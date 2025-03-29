@@ -2,14 +2,10 @@ import socket
 import threading
 import tkinter as tk
 from tkinter import scrolledtext, simpledialog, ttk
+from config import *
 
 class ChatClient:
-    HEADER = 1024
-    FORMAT = 'utf-8'
-    DISCONNECT_MESSAGE = '!DISCONNECT'
-    USER_LIST_UPDATE = '!USER_LIST'
-
-    def __init__(self, server_ip="localhost", server_port=9090):
+    def __init__(self, server_ip="localhost", server_port=PORT):
         self.server_ip = server_ip
         self.server_port = server_port
         self.server_addr = (server_ip, server_port)
@@ -33,12 +29,12 @@ class ChatClient:
                 if not self.username:
                     self.socket.close()
                     return False
-                self.socket.send(self.username.encode(self.FORMAT))
-                response = self.socket.recv(self.HEADER).decode(self.FORMAT)
-                if response == 'Ok':
+                self.socket.send(self.username.encode(FORMAT))
+                response = self.socket.recv(HEADER).decode(FORMAT)
+                if response == USERNAME_ACCEPTED:
                     self.connected = True
                     return True
-                elif response == 'Taken':
+                elif response == USERNAME_TAKEN:
                     continue
                 else:
                     self.socket.close()
@@ -51,7 +47,7 @@ class ChatClient:
     def disconnect(self):
         if self.connected:
             try:
-                self.socket.send(self.DISCONNECT_MESSAGE.encode(self.FORMAT))
+                self.socket.send(DISCONNECT_MESSAGE.encode(FORMAT))
                 self.connected = False
                 self.socket.close()
             except Exception:
@@ -63,7 +59,7 @@ class ChatClient:
     def receive_messages(self):
         while self.connected:
             try:
-                message = self.socket.recv(self.HEADER).decode(self.FORMAT)
+                message = self.socket.recv(HEADER).decode(FORMAT)
                 if not message:
                     break
                 self.message_queue.append(message)  # Append to list
@@ -71,13 +67,12 @@ class ChatClient:
                 break
         self.connected = False
 
-
     def process_message_queue(self):
         try:
             while self.message_queue:
                 message = self.message_queue.pop(0)  # Pop the first message
-                if message.startswith(f"{self.USER_LIST_UPDATE}:"):
-                    user_list = message[len(f"{self.USER_LIST_UPDATE}:"):].split(',')
+                if message.startswith(f"{USER_LIST_UPDATE}:"):
+                    user_list = message[len(f"{USER_LIST_UPDATE}:"):].split(',')
                     if self.username in user_list:
                         user_list.remove(self.username)
                     self.update_user_dropdown(user_list)
@@ -89,7 +84,6 @@ class ChatClient:
             pass
         if self.root and self.root.winfo_exists():
             self.root.after(100, self.process_message_queue)
-
 
     def handle_direct_message(self, message):
         try:
@@ -135,15 +129,15 @@ class ChatClient:
 
     def send_message(self, message):
         try:
-            if message.startswith("/dm "):
+            if message.startswith(f"{DM_CMD} "):
                 parts = message.split(" ", 2)
                 if len(parts) < 3:
                     return
                 recipient, msg_content = parts[1], parts[2]
-                self.socket.send(f"/dm {recipient} {msg_content}".encode(self.FORMAT))
+                self.socket.send(f"{DM_CMD} {recipient} {msg_content}".encode(FORMAT))
                 self.last_sent_messages.append(f"DM [{recipient}]: {msg_content}")
             else:
-                self.socket.send(message.encode(self.FORMAT))
+                self.socket.send(message.encode(FORMAT))
         except Exception:
             pass
 
@@ -209,7 +203,7 @@ class ChatClient:
         def send_dm():
             message = entry.get()
             if message:
-                self.send_message(f"/dm {target} {message}")
+                self.send_message(f"{DM_CMD} {target} {message}")
                 self.display_dm_message(target, f"You -> {target}: {message}")
                 entry.delete(0, tk.END)
 
@@ -225,6 +219,6 @@ class ChatClient:
             self.root.mainloop()
 
 if __name__ == "__main__":
-    SERVER_IP = "192.168.1.12"
+    SERVER_IP = str(input("Enter server-ip: "))
     client = ChatClient(server_ip=SERVER_IP)
     client.start()
