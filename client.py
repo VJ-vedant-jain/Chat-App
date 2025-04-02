@@ -57,20 +57,22 @@ class ChatClient:
         threading.Thread(target=self.receive_messages, daemon=True).start()
 
     def receive_messages(self):
-        while self.connected:
+        while True:
             try:
-                message = self.socket.recv(HEADER).decode(FORMAT)
+                message = self.socket.recv(PORT).decode(FORMAT)
                 if not message:
                     break
-                self.message_queue.append(message)  # Append to list
-            except Exception:
+                messages = message.split("\n")
+                for msg in messages:
+                    self.message_queue.append(msg)
+            except:
+                print("Error receiving message.")
                 break
-        self.connected = False
 
     def process_message_queue(self):
         try:
             while self.message_queue:
-                message = self.message_queue.pop(0)  # Pop the first message
+                message = self.message_queue.pop(0)
                 if message.startswith(f"{USER_LIST_UPDATE}:"):
                     user_list = message[len(f"{USER_LIST_UPDATE}:"):].split(',')
                     if self.username in user_list:

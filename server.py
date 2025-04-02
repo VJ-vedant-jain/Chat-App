@@ -1,6 +1,7 @@
 import socket
 import threading
 from config import *
+from manageSQL import add_message, load_chat
 
 class ChatServer:
     def __init__(self, host=socket.gethostbyname(socket.gethostname()), port=PORT):
@@ -50,6 +51,9 @@ class ChatServer:
         if disconnected_clients:
             self.update_user_list()
 
+        add_message(message)
+        
+
     def handle_client(self, conn, addr):
         username = self.register_username(conn)
         if not username:
@@ -59,6 +63,10 @@ class ChatServer:
         self.update_user_list()
 
         print(f"User {username} registered from {addr}")
+
+        chat_history = load_chat()
+        full_history = "\n".join(chat_history)
+        conn.send(full_history.encode(FORMAT))
 
         try:
             while True:
