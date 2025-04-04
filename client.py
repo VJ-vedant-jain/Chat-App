@@ -79,7 +79,7 @@ class ChatClient:
         """
         while True:
             try:
-                message = self.socket.recv(PORT).decode(FORMAT)
+                message = self.socket.recv(HEADER).decode(FORMAT)
                 if not message:
                     break
                 messages = message.split("\n")
