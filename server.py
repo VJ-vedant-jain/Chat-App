@@ -4,7 +4,7 @@ from config import *
 from manageSQL import add_message, load_chat
 
 class ChatServer:
-    def __init__(self, host=socket.gethostbyname(socket.gethostname()), port=PORT):
+    def __init__(self, port, host=socket.gethostbyname(socket.gethostname())):
         self.port = port
         self.host = host
         self.addr = (self.host, self.port)
@@ -141,5 +141,6 @@ class ChatServer:
                 break
 
 if __name__ == "__main__":
-    server = ChatServer()
+    port = int(input("Enter server-port (user requires it for connection): "))
+    server = ChatServer(port=port)
     server.start()

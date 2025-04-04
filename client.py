@@ -5,7 +5,14 @@ from tkinter import scrolledtext, simpledialog, ttk
 from config import *
 
 class ChatClient:
-    def __init__(self, server_ip="localhost", server_port=PORT):
+    """
+    A class for clients
+    """
+
+    def __init__(self, server_port, server_ip="localhost"):
+        """
+        Initializing many many stuffs :skull:
+        """
         self.server_ip = server_ip
         self.server_port = server_port
         self.server_addr = (server_ip, server_port)
@@ -13,7 +20,6 @@ class ChatClient:
         self.socket = None
         self.connected = False
         self.message_queue = []
-        self.last_sent_messages = []
         self.root = None
         self.chat_box = None
         self.message_entry = None
@@ -21,6 +27,11 @@ class ChatClient:
         self.dm_windows = {}
 
     def connect(self):
+        """
+        Connects the user to the server
+        1. asks user for username and conveys it to server and checks response of server if username taken or nah
+        2. but uhh if any error comes (sadly) then just closes the program :)
+        """
         try:
             self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.socket.connect(self.server_addr)
@@ -45,6 +56,9 @@ class ChatClient:
             return False
 
     def disconnect(self):
+        """
+        Disconnects user from server through the disconnect message
+        """
         if self.connected:
             try:
                 self.socket.send(DISCONNECT_MESSAGE.encode(FORMAT))
@@ -54,9 +68,15 @@ class ChatClient:
                 pass
 
     def start_receiving(self):
+        """
+        just as it sounds. starts a thread to receive messages cuz well python cant do multiple tings at the same time :/
+        """
         threading.Thread(target=self.receive_messages, daemon=True).start()
 
     def receive_messages(self):
+        """
+        receives messages from server and adds them to the queue to send messages so well... we can send them?
+        """
         while True:
             try:
                 message = self.socket.recv(PORT).decode(FORMAT)
@@ -70,6 +90,9 @@ class ChatClient:
                 break
 
     def process_message_queue(self):
+        """
+        well if there is some tings in the message queue, it sends them to the server... maybe?
+        """
         try:
             while self.message_queue:
                 message = self.message_queue.pop(0)
@@ -88,6 +111,10 @@ class ChatClient:
             self.root.after(100, self.process_message_queue)
 
     def handle_direct_message(self, message):
+        """
+        so if when the user receives message from server startin with "DM [<username>]" 
+        then if the dm window exists, sends message there and if it doesn't exist, well, it creates one and then sends.
+        """
         try:
             parts = message.split("]: ", 1)
             if len(parts) != 2:
@@ -107,6 +134,9 @@ class ChatClient:
             pass
 
     def display_message(self, message):
+        """
+        appends received message to the chat_box (foooorrrr global chat)?
+        """
         if self.chat_box:
             self.chat_box.config(state=tk.NORMAL)
             self.chat_box.insert(tk.END, message + '\n')
@@ -114,6 +144,10 @@ class ChatClient:
             self.chat_box.yview(tk.END)
 
     def display_dm_message(self, target, message):
+        """
+        appends received message to dm_window maybe
+        if the DM window doesn't exist, it's created inside `handle_direct_message()`
+        """
         if target in self.dm_windows:
             dm_info = self.dm_windows[target]
             chat_box = dm_info['chat_box']
@@ -123,6 +157,9 @@ class ChatClient:
             chat_box.yview(tk.END)
 
     def update_user_dropdown(self, user_list):
+        """
+        updates user dropdown, if selected user... leaves... sets selection to Global Chat
+        """
         if self.user_dropdown:
             current_selection = self.user_dropdown.get()
             self.user_dropdown['values'] = ["Global Chat"] + user_list
@@ -130,6 +167,10 @@ class ChatClient:
                 self.user_dropdown.set("Global Chat")
 
     def send_message(self, message):
+        """
+        checks if the message HAS the DM_CMD if yes, sends the DM
+        if no, its goes to the server to decide if its a whispher or broadcast and sends accordingly
+        """
         try:
             if message.startswith(f"{DM_CMD} "):
                 parts = message.split(" ", 2)
@@ -137,13 +178,15 @@ class ChatClient:
                     return
                 recipient, msg_content = parts[1], parts[2]
                 self.socket.send(f"{DM_CMD} {recipient} {msg_content}".encode(FORMAT))
-                self.last_sent_messages.append(f"DM [{recipient}]: {msg_content}")
             else:
                 self.socket.send(message.encode(FORMAT))
         except Exception:
             pass
 
     def setup_gui(self):
+        """
+        does the gui *magic*
+        """
         self.root = tk.Tk()
         self.root.title(f"Chat App - {self.username}")
         self.root.geometry("700x500")
@@ -168,6 +211,7 @@ class ChatClient:
 
         self.message_entry = tk.Entry(main_frame, font=("Arial", 10))
         self.message_entry.pack(padx=5, pady=5, fill=tk.X)
+        self.message_entry.bind("<Return>", lambda event: self.send_from_main())
 
         send_button = tk.Button(main_frame, text="Send", command=self.send_from_main)
         send_button.pack(pady=5)
@@ -175,19 +219,28 @@ class ChatClient:
         self.root.after(100, self.process_message_queue)
 
     def send_from_main(self):
+        """
+        collects message from the message entry and then uhh passes it to the send_message() function and well its job is done
+        """
         message = self.message_entry.get()
         if message:
             self.send_message(message)
             self.message_entry.delete(0, tk.END)
 
     def open_selected_dm(self):
+        """
+        opens the dm window user selects :)
+        """
         selected = self.user_dropdown.get()
         if selected != "Global Chat":
             self.create_dm_window(selected)
 
     def create_dm_window(self, target):
+        """
+        Creates the dm window for chatting :)
+        """
         if target in self.dm_windows:
-            return
+            self.dm_windows.pop(target)
 
         dm_window = tk.Toplevel(self.root)
         dm_window.title(f"DM with {target}")
@@ -203,18 +256,26 @@ class ChatClient:
         entry.grid(row=1, column=0, padx=5, pady=5, sticky="ew")
 
         def send_dm():
+            """
+            sends uhh dm?
+            """
             message = entry.get()
             if message:
                 self.send_message(f"{DM_CMD} {target} {message}")
                 self.display_dm_message(target, f"You -> {target}: {message}")
                 entry.delete(0, tk.END)
 
+
+        entry.bind("<Return>", lambda event: send_dm())
         send_button = tk.Button(dm_window, text="Send", command=send_dm)
         send_button.grid(row=1, column=1, padx=5, pady=5)
 
         self.dm_windows[target] = {"window": dm_window, "chat_box": chat_box}
 
     def start(self):
+        """
+        starts the server :/
+        """
         if self.connect():
             self.setup_gui()
             self.start_receiving()
@@ -222,5 +283,6 @@ class ChatClient:
 
 if __name__ == "__main__":
     SERVER_IP = str(input("Enter server-ip: "))
-    client = ChatClient(server_ip=SERVER_IP)
+    PORT = int(input("Enter server-port: "))
+    client = ChatClient(server_ip=SERVER_IP, server_port=PORT)
     client.start()

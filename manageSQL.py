@@ -1,12 +1,12 @@
 import mysql.connector
 
-PASSWORD = str(input("Enter password: "))
+PASSWORD = str(input("Enter password (for SQL storage with mysql): "))
 
 db = mysql.connector.connect(
     host = 'localhost',
     user = 'root',
     password = PASSWORD,
-    database = 'chat-app-global-chat'
+    database = 'chat-app'
 )
 
 mycursor = db.cursor()

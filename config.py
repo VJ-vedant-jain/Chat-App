@@ -4,7 +4,6 @@ from dotenv import load_dotenv
 load_dotenv()
 
 HEADER = int(os.getenv('HEADER', 1024))
-PORT = int(os.getenv('PORT', 9090))
 FORMAT = os.getenv('FORMAT', 'utf-8')
 
 DISCONNECT_MESSAGE = os.getenv('DISCONNECT_MESSAGE', '!DISCONNECT')
