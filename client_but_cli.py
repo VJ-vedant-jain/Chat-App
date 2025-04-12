@@ -1,19 +1,20 @@
 import socket
 import threading
 
-import json
 
+ipAd = str(input("Enter IP address - "))
+poAd = int(input("Enter Port number - "))
 
 HEADER = 1024
 FORMAT = 'utf-8'
 DISCONNECT_MESSAGE = '!DISCONNECT'
 
-ADDR = ("192.168.29.101", 9090)
+ADDR = (ipAd, poAd)
+
+username = input("Enter Username - ")
 
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client.connect(ADDR)
-
-username = input("Enter Username - ")
 
 if not username:
     exit()

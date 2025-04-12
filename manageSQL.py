@@ -1,15 +1,17 @@
 import mysql.connector
 
-PASSWORD = str(input("Enter password (for SQL storage with mysql): "))
+PASSWORD = input("Enter your SQL password - ")
 
 db = mysql.connector.connect(
     host = 'localhost',
     user = 'root',
     password = PASSWORD,
-    database = 'chat-app'
+    database = 'chatApp'
 )
 
 mycursor = db.cursor()
+
+mycursor.execute('CREATE DATABASE IF NOT EXISTS chatApp;')
 
 mycursor.execute(
     '''
