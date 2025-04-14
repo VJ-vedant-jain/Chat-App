@@ -7,7 +7,7 @@ You must have mySQL v.8 or higher installed on your system, and have configured 
 
 The server file will automagically generate the database for you
 
-# Changelog V4.2.0.test
+# Changelog V4.2.1.test
 
 Uploaded on 14 April, 2025.
 

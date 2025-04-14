@@ -53,11 +53,10 @@ def load_chat():
             SELECT username, message 
             FROM global_chat 
             ORDER BY id DESC 
-            LIMIT 64
+            LIMIT 100
         '''
     )
     messages = mycursor.fetchall()
-    print("Loaded messages from DB:", messages)
     messages.reverse()
 
     list_messages = []

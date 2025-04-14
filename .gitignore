@@ -1,1 +1,3 @@
 **/__pycache__
+src/logs/log_client.txt
+src/logs/log_server.txt

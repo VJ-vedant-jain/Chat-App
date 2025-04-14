@@ -1,7 +1,7 @@
 import socket
 import threading
-from config import *
-from manageSQL import add_message, load_chat
+from constants.config import *
+from sql.manageSQL import add_message, load_chat
 
 class ChatServer:
     def __init__(self, port, host=socket.gethostbyname(socket.gethostname())):

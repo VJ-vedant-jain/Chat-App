@@ -5,7 +5,7 @@ from PyQt6.QtWidgets import (
     QTextEdit, QLineEdit, QPushButton, QComboBox, QLabel, QDialog
 )
 from PyQt6.QtCore import QTimer, Qt
-from config import *
+from constants.config import *
 import sys
 
 class DMWindow(QDialog):

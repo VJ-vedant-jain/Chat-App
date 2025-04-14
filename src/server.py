@@ -1,7 +1,7 @@
 import socket
-import threading
-from config import *
-from manageSQL import add_message, load_chat
+import threading, os
+from constants.config import *
+from sql.manageSQL import add_message, load_chat
 
 class ChatServer:
     def __init__(self, port, host=socket.gethostbyname(socket.gethostname())):
@@ -17,14 +17,16 @@ class ChatServer:
         self.server_socket.listen()
 
         print(f"Server listening on {self.host}:{self.port}")
+        self.log_debug(f"Server listening on {self.host}:{self.port}")
 
         try:
             while True:
                 conn, addr = self.server_socket.accept()
-                print(f"New connection from {addr}")
+                self.log_debug(f"New connection from {addr}")
                 threading.Thread(target=self.handle_client, args=(conn, addr), daemon=True).start()
         except KeyboardInterrupt:
             print("Server shutting down...")
+            self.log_debug("Server shutting down...")
         finally:
             if self.server_socket:
                 self.server_socket.close()
@@ -34,14 +36,14 @@ class ChatServer:
         self.broadcast(f"{USER_LIST_UPDATE}:{','.join(user_list)}")
 
     def broadcast(self, message):
-        print(f"Broadcasting: {message}")
+        self.log_debug(f"Broadcasting: {message}")
         disconnected_clients = []
 
         for client in list(self.clients.keys()):
             try:
                 client.send(message.encode(FORMAT))
             except Exception:
-                print(f"Failed to send message to {self.clients.get(client, 'unknown')}")
+                self.log_debug(f"Failed to send message to {self.clients.get(client, 'unknown')}")
                 disconnected_clients.append(client)
 
         for client in disconnected_clients:
@@ -62,7 +64,7 @@ class ChatServer:
         self.clients[conn] = username
         self.update_user_list()
 
-        print(f"User {username} registered from {addr}")
+        self.log_debug(f"User {username} registered from {addr}")
 
         chat_history = load_chat()
         full_history = "\n".join(chat_history)
@@ -75,19 +77,19 @@ class ChatServer:
                     break
 
                 if message == DISCONNECT_MESSAGE:
-                    print(f"User {username} disconnected")
+                    self.log_debug(f"User {username} disconnected")
                     break
 
                 self.process_message(conn, username, message)
 
         except Exception as e:
-            print(f"Error handling client {username}: {e}")
+            self.log_debug(f"Error handling client {username}: {e}")
         finally:
             if conn in self.clients:
                 del self.clients[conn]
             self.update_user_list()
             conn.close()
-            print(f"Connection with {username} closed")
+            self.log_debug(f"Connection with {username} closed")
 
     def register_username(self, conn):
         while True:
@@ -102,7 +104,7 @@ class ChatServer:
                     conn.send(USERNAME_ACCEPTED.encode(FORMAT))
                     return username
             except Exception as e:
-                print(f"Error during username registration: {e}")
+                self.log_debug(f"Error during username registration: {e}")
                 return None
 
     def process_message(self, conn, sender, message):
@@ -120,7 +122,7 @@ class ChatServer:
             sender_conn.send(f"User {recipient_name} not found.".encode(FORMAT))
             return
 
-        print(f"Whisper from {sender_name} to {recipient_name}: {message}")
+        self.log_debug(f"Whisper from {sender_name} to {recipient_name}: {message}")
 
         for client, name in self.clients.items():
             if name == recipient_name:
@@ -133,14 +135,22 @@ class ChatServer:
             sender_conn.send(f"User {recipient_name} not found.".encode(FORMAT))
             return
 
-        print(f"DM from {sender_name} to {recipient_name}: {message}")
+        self.log_debug(f"DM from {sender_name} to {recipient_name}: {message}")
 
         for client, name in self.clients.items():
             if name == recipient_name:
                 client.send(f"DM [{sender_name}]: {message}".encode(FORMAT))
                 break
 
+    def log_debug(self, message):
+        with open('logs/log_server.txt', 'a') as file:
+            file.write(message + "\n\n")
+
 if __name__ == "__main__":
+    if not os.path.exists('logs'):
+        os.makedirs('logs')
+    with open('logs/log_client.txt', 'w') as file:
+        file.write("")
     port = int(input("Enter server-port (user requires it for connection): "))
     server = ChatServer(port=port)
     server.start()

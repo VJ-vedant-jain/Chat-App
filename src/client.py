@@ -2,9 +2,9 @@ import socket
 import threading
 from PyQt5.QtWidgets import QApplication, QInputDialog, QDialog, QVBoxLayout, QTextEdit, QLineEdit, QPushButton
 from PyQt5.QtCore import QTimer
-from config import *
-import sys
-from ui import ChatWindow
+from constants.config import *
+import sys, os
+from ui.ui import ChatWindow
 
 class DMWindow(QDialog):
     def __init__(self, target, send_dm_callback, parent=None):
@@ -82,7 +82,9 @@ class ChatClient(ChatWindow):
         self.change_server_button.clicked.connect(self.change_server)
 
     def log_debug(self, message):
-        self.text_edit.append(message)
+        self.text_edit.append(message + "\n")
+        with open('logs/log_client.txt', 'a') as file:
+            file.write(message + "\n\n")
 
     def update_server_display(self):
         self.server_label.setText(f"{self.server_ip}:{self.server_port}")
@@ -246,6 +248,10 @@ class ChatClient(ChatWindow):
 
 
 if __name__ == "__main__":
+    if not os.path.exists('logs'):
+        os.makedirs('logs')
+    with open('logs/log_client.txt', 'w') as file:
+        file.write("")
     app = QApplication(sys.argv)  
     ip = input("Enter server IP: ")
     port = int(input("Enter port: "))

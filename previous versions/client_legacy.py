@@ -2,7 +2,7 @@ import socket
 import threading
 import tkinter as tk
 from tkinter import scrolledtext, simpledialog, ttk
-from config import *
+from constants.config import *
 
 class ChatClient:
     """
