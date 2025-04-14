@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ChatWindow</class>
+ <widget class="QMainWindow" name="ChatWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>852</width>
+    <height>508</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Chat App</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QFrame" name="dmFrame">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>211</width>
+      <height>121</height>
+     </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::StyledPanel</enum>
+    </property>
+    <widget class="QLabel" name="chatWithLabel">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>130</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Chat With:</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="userDropdown">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>40</y>
+       <width>191</width>
+       <height>25</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="openDmButton">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>70</y>
+       <width>191</width>
+       <height>30</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Open DM</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QFrame" name="mainFrame">
+    <property name="geometry">
+     <rect>
+      <x>230</x>
+      <y>10</y>
+      <width>611</width>
+      <height>481</height>
+     </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::StyledPanel</enum>
+    </property>
+    <widget class="QTextEdit" name="chatBox">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>591</width>
+       <height>421</height>
+      </rect>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="messageEntry">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>440</y>
+       <width>491</width>
+       <height>30</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="sendButton">
+     <property name="geometry">
+      <rect>
+       <x>510</x>
+       <y>440</y>
+       <width>91</width>
+       <height>30</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Send</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QFrame" name="serverFrame">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>140</y>
+      <width>211</width>
+      <height>121</height>
+     </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::StyledPanel</enum>
+    </property>
+    <widget class="QLabel" name="chatWithLabel_5">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>130</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Server:</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="userDropdown_5">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>40</y>
+       <width>191</width>
+       <height>25</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="openDmButton_5">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>70</y>
+       <width>191</width>
+       <height>30</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Change Server</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QFrame" name="debugFrame">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>270</y>
+      <width>211</width>
+      <height>221</height>
+     </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::StyledPanel</enum>
+    </property>
+    <widget class="QTextEdit" name="textEdit">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>191</width>
+       <height>201</height>
+      </rect>
+     </property>
+    </widget>
+   </widget>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

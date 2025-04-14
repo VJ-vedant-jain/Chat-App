@@ -7,17 +7,24 @@ You must have mySQL v.8 or higher installed on your system, and have configured 
 
 The server file will automagically generate the database for you
 
-# Changelog V3.2.0.test
+# Changelog V4.2.0.test
 
-Uploaded on 12 April, 2025.
+Uploaded on 14 April, 2025.
 
-General QOL stuff with SQL, to make it more "friendly" for linux users.
-Oh yeah we have SQL now by the way, it will retain message history and is a lot more secure with password locks and more.
+Old versions now saved in folder named "previous versions"
 
-PyQT client version is *almost* complete, and has now replaced the old tkinter version. The old version will show under "client_legacy".
+Changes - 
+1. Rehauled the whole UI
+2. Now shows server ip and port to support different chatrooms and allows you to change server after being loaded
+3. A Debug box now shows what really happened... to be improved in future updates :)
 
 # Known Issues
 
-1.DM window on the main client once closed, does not open again. Fixing it right now.
-2.CLI version is.... a work in progress. Ignore it.
-3. Stuff looking kinda basic, styling will be added soon.
+1. DM window on the main client once closed, does not open again. Fixing it right now. - Sadly still exists
+3. CLI version is.... a work in progress. Ignore it.
+3. Stuff looking kinda basic, styling will be added soon. - Kindaaa fixed
+4. Loaded messages have a bit of problem with usernames. Instead of [username]: you see [[username]:]:
+
+# Future Plan
+
+1. Replace the label showing current server with a dropdown showing active servers (oh boii this gon be lit)

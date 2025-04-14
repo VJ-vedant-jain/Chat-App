@@ -2,17 +2,32 @@ import mysql.connector
 
 PASSWORD = input("Enter your SQL password - ")
 
+# Step 1: First, connect to MySQL without specifying a database.
 db = mysql.connector.connect(
-    host = 'localhost',
-    user = 'root',
-    password = PASSWORD,
-    database = 'chatApp'
+    host='localhost',
+    user='root',
+    password=PASSWORD
 )
 
 mycursor = db.cursor()
 
+# Step 2: Create the database if it doesn't exist
 mycursor.execute('CREATE DATABASE IF NOT EXISTS chatApp;')
 
+# Step 3: Close the connection to reconnect to the newly created database
+db.close()
+
+# Step 4: Now, reconnect, but this time specifying the 'chatApp' database
+db = mysql.connector.connect(
+    host='localhost',
+    user='root',
+    password=PASSWORD,
+    database='chatApp'
+)
+
+mycursor = db.cursor()
+
+# Step 5: Create the table if it doesn't exist
 mycursor.execute(
     '''
         CREATE TABLE IF NOT EXISTS global_chat (
@@ -23,6 +38,7 @@ mycursor.execute(
     '''
 )
 
+# Function to add a message to the database
 def add_message(sent):
     parts = sent.strip().split()
 
@@ -38,7 +54,7 @@ def add_message(sent):
     mycursor.execute(sql, values)
     db.commit()
 
-
+# Function to load the last 24 messages from the database
 def load_chat():
     mycursor.execute(
         '''
