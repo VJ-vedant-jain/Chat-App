@@ -5,6 +5,7 @@ from sql.manageSQL import add_message, load_chat
 import sql.utils as serverUtil 
 
 users_typing = []
+banned_ips = []
 
 class ChatServer:
     def __init__(self, port, host=socket.gethostbyname(socket.gethostname())):
@@ -43,7 +44,8 @@ class ChatServer:
         self.broadcast(f"{IS_TYPING_LIST}:{', '.join(user_typing_list)}")
 
     def broadcast(self, message):
-        self.log_debug(f"Broadcasting: {message}")
+        if not message.startswith(f"{IS_TYPING_LIST}"):
+            self.log_debug(f"Broadcasting: {message}")
         disconnected_clients = []
 
         for client in list(self.clients.keys()):
@@ -64,6 +66,14 @@ class ChatServer:
             add_message(message)
 
     def handle_client(self, conn, addr):
+
+        ip, _ = addr
+        if ip in banned_ips:
+            conn.send(DISCONNECT_KICK_MESSAGE.encode(FORMAT))
+            conn.close()
+            self.log_debug(f"Banned user with ip {ip} tried joining. Rejected")
+            return
+
         username = self.register_username(conn)
         if not username:
             return
@@ -74,7 +84,15 @@ class ChatServer:
         self.log_debug(f"User {username} registered from {addr}")
 
         chat_history = load_chat()
-        full_history = "\n".join(chat_history)
+        fixed_history = []
+        for msg in chat_history:
+            if msg.startswith("[[") and "]:]: " in msg:
+                fixed_msg = msg.replace("[[", "[").replace("]:]: ", "]: ")
+                fixed_history.append(fixed_msg)
+            else:
+                fixed_history.append(msg)
+        
+        full_history = "\n".join(fixed_history)
         conn.send(full_history.encode(FORMAT))
 
         try:
@@ -164,37 +182,55 @@ class ChatServer:
             file.write(message + "\n\n")
 
 def handle_cli_commands(server_instance):
-     while True:
-         cmd = input(">> ").strip()
-         if cmd == "/list":
-             print("Connected users:")
-             for user in server_instance.clients.values():
-                 print(f"- {user}")
-         elif cmd.startswith("/kick "):
-             username = cmd.split(" ", 1)[1]
-             for conn, user in list(server_instance.clients.items()):
-                 if user == username:
-                     conn.send(DISCONNECT_KICK_MESSAGE.encode(FORMAT))
-                     conn.close()
-                     print(f"Kicked {username}")
-                     break
-             else:
-                 print("User not found.")
-         elif cmd == "/abort-server":
-             print("Shutting down server...")
-             os._exit(0)
-         elif cmd == '/clear-all' : 
-             print("Purging database. A restart of the clients will be required to see the changes to take effect.")
-             serverUtil.purge()
-         elif cmd == '/prune' : 
-             try : 
-                 noOfMessagesPruned = int(input("Enter the number of messages - "))
-                 serverUtil.prune(noOfMessagesPruned)
-                 print("Pruned ", noOfMessagesPruned, " messages.")
-             except : 
-                 print("Input value must be a number.")
-         else:
-             print("Unknown command.")
+    while True:
+        cmd = input(">> ").strip()
+        if cmd == "/list":
+            print("Connected users:")
+            for user in server_instance.clients.values():
+                print(f"- {user}")
+        elif cmd.startswith("/kick "):
+            username = cmd.split(" ", 1)[1]
+            for conn, user in list(server_instance.clients.items()):
+                if user == username:
+                    conn.send(DISCONNECT_KICK_MESSAGE.encode(FORMAT))
+                    conn.close()
+                    print(f"Kicked {username}")
+                    break
+            else:
+                print("User not found.")
+        elif cmd == "/abort-server":
+            print("Shutting down server...")
+            os._exit(0)
+        elif cmd == '/clear-all' : 
+            print("Purging database. A restart of the clients will be required to see the changes to take effect - ")
+            serverUtil.purge()
+        elif cmd == '/prune' : 
+            try : 
+                noOfMessagesPruned = int(input("Enter the number of messages - "))
+                serverUtil.prune(noOfMessagesPruned)
+                print("Pruned ", noOfMessagesPruned, " messages.")
+            except : 
+                print("Input value must be a number.")
+        elif cmd.startswith("/ban "):
+            username = cmd.split(" ", 1)[1]
+            banned_ip = None
+            target_conn = None
+            for conn, name in server_instance.clients.items():
+                if name == username:
+                    ip, _ = conn.getpeername()
+                    banned_ip = ip
+                    target_conn = conn
+                    break
+            if banned_ip:
+                banned_ips.append(banned_ip)
+                server_instance.log_debug(f"Banned user with ip {banned_ip}")
+                print("Successfully banned")
+                target_conn.send(BAN_MESSAGE.encode(FORMAT))
+            else:
+                server_instance.log_debug(f"User {username} not found to be banned")
+                print("User not found")
+        else:
+            print("Unknown command.")
 
 
 if __name__ == "__main__":
