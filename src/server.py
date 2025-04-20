@@ -174,7 +174,6 @@ def handle_cli_commands(server_instance):
              username = cmd.split(" ", 1)[1]
              for conn, user in list(server_instance.clients.items()):
                  if user == username:
-                     DISCONNECT_KICK_MESSAGE = "!DISCONNECT-KICK"
                      conn.send(DISCONNECT_KICK_MESSAGE.encode(FORMAT))
                      conn.close()
                      print(f"Kicked {username}")

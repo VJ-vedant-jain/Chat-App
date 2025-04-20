@@ -7,7 +7,7 @@ You must have mySQL v.8 or higher installed on your system, and have configured 
 
 The server file will automagically generate the database for you
 
-# Changelog V4.3.0.test
+# Changelog V4.3.2.test
 
 Uploaded on 20 April, 2025.
 
@@ -39,5 +39,5 @@ More functions will be coming soon :)
 
 1. Replace the label showing current server with a dropdown showing active servers (oh boii this gon be lit)
 2. Add a ton of more commands, heck, lets make the server itself a GUI.
-3. Add certain "channels" or "sub chats" within servers, allowing for organized conversations.
+3. Add certain "channels" or "sub chats" within servers, allowing for organized conversations. (yea this will be... hard af)
 4. Add a ban list to ban or restrict a user. This includes muted users, restricted access to channels, and the fun banhammer.

@@ -1,6 +1,6 @@
 import socket
 import threading
-from PyQt5.QtWidgets import QApplication, QInputDialog, QDialog, QVBoxLayout, QTextEdit, QLineEdit, QPushButton
+from PyQt5.QtWidgets import QApplication, QInputDialog, QDialog, QVBoxLayout, QTextEdit, QLineEdit, QPushButton, QMessageBox
 from PyQt5.QtCore import QTimer
 from constants.config import *
 import sys, os
@@ -186,6 +186,15 @@ class ChatClient(ChatWindow):
                 self.log_debug(f"User list updated: {', '.join(user_list)}")
             elif message.startswith("DM "):
                 self.handle_direct_message(message)
+            elif message.startswith(f"{DISCONNECT_KICK_MESSAGE}"):
+                self.connected = False
+                msg = QMessageBox()
+                msg.setIcon(QMessageBox.Critical)
+                msg.setText("Kicked.")
+                msg.setInformativeText('You have been kicked from the server.')
+                msg.setWindowTitle("Womp Womp")
+                msg.exec_()
+                sys.exit()
             else:
                 self.display_message(message)
 
