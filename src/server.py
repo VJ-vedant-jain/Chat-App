@@ -4,6 +4,8 @@ from constants.config import *
 from sql.manageSQL import add_message, load_chat
 import sql.utils as serverUtil 
 
+users_typing = []
+
 class ChatServer:
     def __init__(self, port, host=socket.gethostbyname(socket.gethostname())):
         self.port = port
@@ -36,6 +38,10 @@ class ChatServer:
         user_list = list(self.clients.values())
         self.broadcast(f"{USER_LIST_UPDATE}:{','.join(user_list)}")
 
+    def update_users_typing_list(self):
+        user_typing_list = list(users_typing)
+        self.broadcast(f"{IS_TYPING_LIST}:{', '.join(user_typing_list)}")
+
     def broadcast(self, message):
         self.log_debug(f"Broadcasting: {message}")
         disconnected_clients = []
@@ -54,8 +60,8 @@ class ChatServer:
         if disconnected_clients:
             self.update_user_list()
 
-        add_message(message)
-        
+        if not message.startswith((USER_LIST_UPDATE, IS_TYPING_LIST, f"[{IS_TYPING_LIST}:]")):
+            add_message(message)
 
     def handle_client(self, conn, addr):
         username = self.register_username(conn)
@@ -115,6 +121,16 @@ class ChatServer:
             self.handle_whisper(conn, sender, words[1], ' '.join(words[2:]))
         elif len(words) >= 3 and words[0] == DM_CMD:
             self.handle_direct_message(conn, sender, words[1], ' '.join(words[2:]))
+        elif len(words) >= 2 and words[0] == IS_TYPING:
+            user = ' '.join(words[1:])
+            if user not in users_typing:
+                users_typing.append(user)
+            self.update_users_typing_list()
+        elif len(words) >= 2 and words[0] == NOT_TYPING:
+            user = ' '.join(words[1:])
+            if user in users_typing:
+                users_typing.remove(user)
+            self.update_users_typing_list()
         else:
             self.broadcast(f"[{sender}]: {message}")
 
@@ -148,38 +164,38 @@ class ChatServer:
             file.write(message + "\n\n")
 
 def handle_cli_commands(server_instance):
-    while True:
-        cmd = input(">> ").strip()
-        if cmd == "/list":
-            print("Connected users:")
-            for user in server_instance.clients.values():
-                print(f"- {user}")
-        elif cmd.startswith("/kick "):
-            username = cmd.split(" ", 1)[1]
-            for conn, user in list(server_instance.clients.items()):
-                if user == username:
-                    DISCONNECT_KICK_MESSAGE = "!DISCONNECT-KICK"
-                    conn.send(DISCONNECT_KICK_MESSAGE.encode(FORMAT))
-                    conn.close()
-                    print(f"Kicked {username}")
-                    break
-            else:
-                print("User not found.")
-        elif cmd == "/abort-server":
-            print("Shutting down server...")
-            os._exit(0)
-        elif cmd == '/clear-all' : 
-            print("Purging database. A restart of the clients will be required to see the changes to take effect.")
-            serverUtil.purge()
-        elif cmd == '/prune' : 
-            try : 
-                noOfMessagesPruned = int(input("Enter the number of messages - "))
-                serverUtil.prune(noOfMessagesPruned)
-                print("Pruned ", noOfMessagesPruned, " messages.")
-            except : 
-                print("Input value must be a number.")
-        else:
-            print("Unknown command.")
+     while True:
+         cmd = input(">> ").strip()
+         if cmd == "/list":
+             print("Connected users:")
+             for user in server_instance.clients.values():
+                 print(f"- {user}")
+         elif cmd.startswith("/kick "):
+             username = cmd.split(" ", 1)[1]
+             for conn, user in list(server_instance.clients.items()):
+                 if user == username:
+                     DISCONNECT_KICK_MESSAGE = "!DISCONNECT-KICK"
+                     conn.send(DISCONNECT_KICK_MESSAGE.encode(FORMAT))
+                     conn.close()
+                     print(f"Kicked {username}")
+                     break
+             else:
+                 print("User not found.")
+         elif cmd == "/abort-server":
+             print("Shutting down server...")
+             os._exit(0)
+         elif cmd == '/clear-all' : 
+             print("Purging database. A restart of the clients will be required to see the changes to take effect.")
+             serverUtil.purge()
+         elif cmd == '/prune' : 
+             try : 
+                 noOfMessagesPruned = int(input("Enter the number of messages - "))
+                 serverUtil.prune(noOfMessagesPruned)
+                 print("Pruned ", noOfMessagesPruned, " messages.")
+             except : 
+                 print("Input value must be a number.")
+         else:
+             print("Unknown command.")
 
 
 if __name__ == "__main__":

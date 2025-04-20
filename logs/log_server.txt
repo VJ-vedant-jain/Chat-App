@@ -1,0 +1,78 @@
+Server listening on 192.168.1.26:9090
+
+New connection from ('192.168.1.26', 50429)
+
+Broadcasting: !USER_LIST:vedant
+
+User vedant registered from ('192.168.1.26', 50429)
+
+Broadcasting: /USERS_WHO_TYPING:
+
+Broadcasting: /USERS_WHO_TYPING:
+
+Broadcasting: /USERS_WHO_TYPING:
+
+Broadcasting: /USERS_WHO_TYPING:
+
+Broadcasting: /USERS_WHO_TYPING:
+
+Broadcasting: /USERS_WHO_TYPING:vedant
+
+Broadcasting: /USERS_WHO_TYPING:vedant
+
+Broadcasting: /USERS_WHO_TYPING:vedant
+
+Broadcasting: /USERS_WHO_TYPING:
+
+Broadcasting: /USERS_WHO_TYPING:
+
+Broadcasting: /USERS_WHO_TYPING:
+
+Broadcasting: /USERS_WHO_TYPING:
+
+Broadcasting: /USERS_WHO_TYPING:
+
+Broadcasting: /USERS_WHO_TYPING:
+
+Broadcasting: /USERS_WHO_TYPING:
+
+Broadcasting: /USERS_WHO_TYPING:
+
+Broadcasting: /USERS_WHO_TYPING:
+
+Broadcasting: /USERS_WHO_TYPING:
+
+Broadcasting: /USERS_WHO_TYPING:
+
+Broadcasting: /USERS_WHO_TYPING:
+
+Error handling client vedant: [WinError 10054] An existing connection was forcibly closed by the remote host
+
+Broadcasting: !USER_LIST:
+
+Connection with vedant closed
+
+New connection from ('192.168.1.26', 50430)
+
+Broadcasting: !USER_LIST:/USER_NOT_TYPING vedant
+
+User /USER_NOT_TYPING vedant registered from ('192.168.1.26', 50430)
+
+Broadcasting: /USERS_WHO_TYPING:
+
+Broadcasting: /USERS_WHO_TYPING:
+
+Broadcasting: /USERS_WHO_TYPING:
+
+Broadcasting: /USERS_WHO_TYPING:
+
+Broadcasting: /USERS_WHO_TYPING:
+
+Broadcasting: [/USER_NOT_TYPING vedant]: vedy
+
+Error handling client /USER_NOT_TYPING vedant: [WinError 10053] An established connection was aborted by the software in your host machine
+
+Broadcasting: !USER_LIST:
+
+Connection with /USER_NOT_TYPING vedant closed
+
