@@ -2,6 +2,7 @@ import socket
 import threading, os
 from constants.config import *
 from sql.manageSQL import add_message, load_chat
+import sql.utils as serverUtil 
 
 users_typing = []
 
@@ -162,6 +163,40 @@ class ChatServer:
         with open('logs/log_server.txt', 'a') as file:
             file.write(message + "\n\n")
 
+def handle_cli_commands(server_instance):
+     while True:
+         cmd = input(">> ").strip()
+         if cmd == "/list":
+             print("Connected users:")
+             for user in server_instance.clients.values():
+                 print(f"- {user}")
+         elif cmd.startswith("/kick "):
+             username = cmd.split(" ", 1)[1]
+             for conn, user in list(server_instance.clients.items()):
+                 if user == username:
+                     DISCONNECT_KICK_MESSAGE = "!DISCONNECT-KICK"
+                     conn.send(DISCONNECT_KICK_MESSAGE.encode(FORMAT))
+                     conn.close()
+                     print(f"Kicked {username}")
+                     break
+             else:
+                 print("User not found.")
+         elif cmd == "/abort-server":
+             print("Shutting down server...")
+             os._exit(0)
+         elif cmd == '/clear-all' : 
+             print("Purging database. A restart of the clients will be required to see the changes to take effect.")
+             serverUtil.purge()
+         elif cmd == '/prune' : 
+             try : 
+                 noOfMessagesPruned = int(input("Enter the number of messages - "))
+                 serverUtil.prune(noOfMessagesPruned)
+                 print("Pruned ", noOfMessagesPruned, " messages.")
+             except : 
+                 print("Input value must be a number.")
+         else:
+             print("Unknown command.")
+
 if __name__ == "__main__":
     if not os.path.exists('logs'):
         os.makedirs('logs')
@@ -169,4 +204,6 @@ if __name__ == "__main__":
         file.write("")
     port = int(input("Enter server-port (user requires it for connection): "))
     server = ChatServer(port=port)
-    server.start()
+
+    threading.Thread(target=server.start, daemon=True).start()
+    handle_cli_commands(server)  

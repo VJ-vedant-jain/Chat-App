@@ -3,7 +3,7 @@ import threading
 from PyQt5.QtWidgets import QApplication, QInputDialog, QDialog, QVBoxLayout, QTextEdit, QLineEdit, QPushButton
 from PyQt5.QtCore import QTimer
 from constants.config import *
-import sys, os, keyboard, time
+import sys, os
 from ui.ui import ChatWindow
 
 class DMWindow(QDialog):
