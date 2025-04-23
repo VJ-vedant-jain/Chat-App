@@ -32,17 +32,18 @@ mycursor.execute(
 )
 
 def add_message(sent):
-    parts = sent.strip().split()
-
-    if parts[0].startswith("!"):
-        return  
-
-    username = parts[0]
-    message = ' '.join(parts[1:])
-
+    if sent.startswith("[") and "]: " in sent:
+        username_end = sent.find("]: ")
+        username = sent[1:username_end]
+        message = sent[username_end + 3:]
+    else:
+        parts = sent.strip().split(" ", 1)
+        username = parts[0]
+        message = parts[1] if len(parts) > 1 else ""
+    
     sql = "INSERT INTO global_chat (username, message) VALUES (%s, %s)"
     values = (username, message)
-
+    
     mycursor.execute(sql, values)
     db.commit()
 

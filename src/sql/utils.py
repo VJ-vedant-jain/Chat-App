@@ -38,7 +38,9 @@ def prune(number):
     db.commit()
     db.close()
 
+
 if __name__ == "__main__" : 
+
     print("------------------------")
     print("Enter 1 to purge the whole chat history")
     print("Enter 2 to prune chat history to newest 100 messages")
@@ -54,3 +56,4 @@ if __name__ == "__main__" :
             prune()
             break
         print("Enter either 1 or 2")
+    
