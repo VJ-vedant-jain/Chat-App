@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QApplication, QInputDialog, QDialog, QVBoxLayout, QT
 from PyQt5.QtCore import QTimer
 from constants.config import *
 import sys, os
-from ui.ui import ChatWindow
+from ui.client.ui_client import ChatWindow
 
 class DMWindow(QDialog):
     def __init__(self, target, send_dm_callback, parent=None):
@@ -196,7 +196,7 @@ class ChatClient(ChatWindow):
         self.update_user_dropdown(user_list)
         self.log_debug(f"User list updated: {', '.join(user_list)}")
 
-    def handle_kick_message(self):
+    def handle_ban_message(self):
         self.connected = False
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Critical)
@@ -206,7 +206,7 @@ class ChatClient(ChatWindow):
         msg.exec_()
         sys.exit()
 
-    def handle_ban_message(self):
+    def handle_kick_message(self):
         self.connected = False
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Critical)
