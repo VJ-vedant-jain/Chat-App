@@ -9,13 +9,14 @@ You must have mySQL v.8 or higher installed on your system, and have configured 
 
 The server file will automagically generate the database for you
 
-# Changelog V4.4.0.test
+# Changelog V4.5.0.test
 
-Uploaded on 23 April, 2025.
+Uploaded on 14 May, 2025.
 
 Changes - 
 1. Added a whole ass gui for the server (/src/ui/server)
 2. Removed some unnecessary checks for stuff
+3. New BETA CLI client, made as collateral for a surprise coming later....
 
 # Current Server Admin Commands
 
@@ -31,10 +32,12 @@ More functions will be coming soon :)
 
 1. CLI version is.... a work in progress. Ignore it.
 2. .ui and .py files have a bit a difference in gui. (.py ahead of .ui), needs to be merged
+3. exiting the cli client will result in crashing eveything. EVERYTHING. VEDANT PLEASE FIX THIS BRO
 
 # Future Plan
 
 1. Replace the label showing current server with a dropdown showing active servers (oh boii this gon be lit) 
 2. Add certain "channels" or "sub chats" within servers, allowing for organized conversations. (yea this will be... hard af)
 3. Add a ban list to ban or restrict a user. This includes muted users, restricted access to channels, and the fun banhammer.
+4. Bots. Mods. Mod Bots. Bot Mods. You get the memo.
     **planning to have banned user list being saved to a file**
